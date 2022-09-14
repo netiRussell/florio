@@ -1,20 +1,18 @@
-"use strict";
+export async function login_func() {
+  const login_form = {
+    username: document.getElementById("username"),
+    password: document.getElementById("password"),
+    message: document.getElementById("error_message"),
+  };
 
-const form = {
-  username: document.getElementById("username"),
-  password: document.getElementById("password"),
-  submit: document.getElementById("login_button"),
-  message: document.getElementById("error_message"),
-};
-
-form.submit.addEventListener("click", async function () {
   try {
+    // main functionality
     const response = await fetch("includes/php/check_login.php", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: `username=${form.username.value}&password=${form.password.value}`,
+      body: `username=${login_form.username.value}&password=${login_form.password.value}`,
     }).then((data) => {
       if (!data.ok) {
         throw new Error("Server related error.");
@@ -24,6 +22,7 @@ form.submit.addEventListener("click", async function () {
 
     console.log(response);
   } catch (error) {
+    // Error handling
     console.log(error);
   }
-});
+}
