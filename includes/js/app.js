@@ -1,7 +1,8 @@
 "use strict";
+
 //Imports
-import { login_func } from "./async.js";
+import * as Async from "./async.js";
 
 document.getElementById("login_button").addEventListener("click", function () {
-  login_func();
+  Async.login_func();
 });

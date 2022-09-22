@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Florio</title>
+  </head>
+  <body>
+    <main>
+      <!-- Change width via JS -->
+      <article class="main_container actual_container">
+        <section class="left_section left_no_cat">
+          <div class="acc_menu">
+            <p class="acc_info"><span class="username text4">Mark Gabson</span><span class="balance text6">$2000.00</span></p>
+            <nav class="w-menu">
+              <ul class="menu">
+                <li class="regular_li text5"><span class="icon_menu icon_home"></span>Main page</li>
+                <li class="regular_li text5"><span class="icon_menu icon_cart"></span>Cart</li>
+                <li class="regular_li text5"><span class="icon_menu icon_orders"></span>Orders</li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+        <section class="right_section right_section_nosearch">
+          <div class="content content_product">
+            <div class="w-product_info y_scroll">
+              <img class="thumbnail_main" src="img/tanalee-youngblood-T-OYshlMvL0-unsplash.jpg" alt="Product" />
+
+              <div class="product_info">
+                <h1 class="product_name text2">Lorem Ipsum</h1>
+                <p class="path text7"><span>Products</span> / <span>Lorem Ipsum</span></p>
+                <p class="product_description text6_5">
+                  Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in
+                  Virginia. Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney
+                  College in Virginiaampden-Sydney College in Virginia. Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard
+                  McClintock, a Latin professor at Hampden-Sydney College in Virginia. Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
+                  Richard McClintock, a Latin professor at H
+                </p>
+              </div>
+            </div>
+
+            <div class="w-product_func">
+              <div class="product_main_price">
+                <p class="text5">$39.99</p>
+                <hr class="regular_hr" />
+              </div>
+              <div class="product_func">
+                <div class="product_num">
+                  <button id="increase_quantity" class="text7">+</button>
+                  <!-- oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1') -->
+                  <input class="text7 text_input" type="text" spellcheck="false" pattern="[0-9]+" value="1" />
+                  <button id="decrease_quantity" class="text7">-</button>
+                </div>
+
+                <button id="product_order" class="text6 product_order button">Order</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+    </main>
+
+    <!-- <script type="module" src="includes/js/app.js"></script> -->
+  </body>
+</html>

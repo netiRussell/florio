@@ -1,4 +1,14 @@
 <?php
+    // Sing up rough sketch:
+
+    // include_once("includes/php/dbh_inc.php");
+    // $password_hash = password_hash('123', PASSWORD_DEFAULT);
+    // $sql = "INSERT INTO user (role, name, username, password, orders, account ) VALUES ('admin', 'Russell', 'adm3in_test', '" . $password_hash . "', '', 2000)"; // Creating a user with hashed password
+    // $result = mysqli_query($conn, $sql);
+    // var_dump($result);
+  ?>
+
+<?php
 
   $username = isset($_POST['username']) ? $_POST['username'] : '';
   $password = isset($_POST['password']) ? $_POST['password'] : '';
