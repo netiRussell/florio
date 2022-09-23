@@ -1,3 +1,7 @@
+<?php
+  session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -26,7 +30,12 @@
         <p class="sign_up text6">No account? <span id="sign_up">Sign Up</span> for free</p>
       </article>
     </main>
-
+    <?php
+      $session_id = (isset($_SESSION['name'])) ? $_SESSION['name'] : null;
+    ?>
+    <script type="text/javascript">
+      var session_name ='<?php echo $session_id;?>';
+    </script>
     <script type="module" src="includes/js/app.js"></script>
   </body>
 </html>

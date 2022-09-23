@@ -2,6 +2,7 @@
   --main-color: #f57402;
   --secondary-color: #81bb03;
   --system-white: #f2ece4;
+  --error: #e9411b;
   --black100: #22201e;
   --black90: #383635;
   --black75: #595856;
@@ -71,6 +72,11 @@
 
 .text7 {
   font-size: 13px;
+}
+
+.p_error {
+  color: var(--error);
+  text-align: center;
 }
 
 .button {
@@ -195,6 +201,7 @@ main {
 
 .error_message {
   margin-top: 10px;
+  width: 75%;
 }
 
 .login_button {

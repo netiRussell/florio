@@ -16,42 +16,47 @@
   $ok = true;
   $message = "";
 
+  function fail($msg){
+    $ok = false;
+    echo json_encode(
+      array(
+        'ok' => $ok,
+        'message' => $msg
+      )
+    );
+  }
+
   if( !isset($_POST['username']) || empty($_POST['username']) ){
-    $message .= "<p class='p-error'>Username cannot be empty!</p>";
+    $message .= "Username cannot be empty!";
     $ok = false;
   }
 
   if( !isset($_POST['password']) || empty($_POST['password']) ){
-    $message .= "<p class='p-error'>Password cannot be empty!</p>";
+    $message .= "Password cannot be empty!";
     $ok = false;
   }
 
   if($ok){
     include_once 'dbh_inc.php';
-    $sql = "SELECT id, password, name, orders, account, history FROM user WHERE username = '" . $username . "'";
+    $sql = "SELECT id, role, password, name, orders, account, history FROM user WHERE username = '" . $username . "'";
     $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
 
     if( !password_verify($password, $result['password']) ){
-      $ok = false;
-      $message = "<p class='p-error'>Incorrect username / password</p>";
+      $message = "Incorrect username / password";
+      fail($message);
     } else {
-      $data_id = $result['id'];
-      $data_name = $result['name'];
-      $data_orders = $result['orders'];
-      $data_account = $result['account'];
-      $data_account_history = $result['history'];
+      echo json_encode(
+        array(
+          'ok' => $ok,
+          'id' => $result['id'],
+          'role' => $result['role'],
+          'name' => $result['name'],
+          'orders' => $result['orders'],
+          'account' => $result['account'],
+          'account_history' => $result['history'],
+        )
+      );
     }
+  } else{
+    fail($message);
   }
-
-
-  echo json_encode(
-    array(
-      'ok' => $ok,
-      'message' => $message,
-      'id' => $data_id,
-      'name' => $data_name,
-      'orders' => $data_orders,
-      'account' => $data_account,
-      'account_history' => $data_account_history
-    )
-  );
