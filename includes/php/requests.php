@@ -1,7 +1,12 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
-$request = $_POST['request'];
+// $request = $_POST['request'];
+$request = "show_products";
 
 if( $request == "init_session"){
   $_SESSION['id'] = $_POST['id'];
@@ -18,4 +23,24 @@ if( $request == "init_session"){
   }
 
   session_destroy();
+} else if( $request == "show_products" ){
+  include_once 'dbh_inc.php';
+  $sql = "SELECT * FROM products";
+  $result = mysqli_query($conn, $sql);
+  $html = null;
+
+  while($row = mysqli_fetch_row($result)){
+    if(!strpos(strval($row[3]), '.')){
+      $row[3] .= ".00";
+    }
+
+    $html .= "<div class='product'> <div class='w-thumbnail'> <img class='thumbnail' src='" . $row[2] . "' alt='" . $row[1] . "' /></div><p class='product_text text7'>" . $row[1] . ": " . $row[4] . "</p><div class='w-product_order'> <button class='button button_cart text7'>Order</button> <p class='product_price text7'>$" . $row[3] . "</p></div></div>";
+  }
+  
+
+  echo json_encode(
+    array(
+      'html' => $html,
+    )
+  );
 }

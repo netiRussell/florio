@@ -386,10 +386,19 @@ main {
   width: 100%;
   cursor: pointer;
 }
+
 .product_text {
   margin-top: 8px;
-  line-height: 115%;
   text-align: justify;
+  overflow: hidden;
+  line-height: 1.1rem;
+  max-height: 5.5rem;
+  -webkit-box-orient: vertical;
+  display: block;
+  display: -webkit-box;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 5;
 }
 
 .w-product_order {
