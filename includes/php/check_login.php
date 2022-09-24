@@ -1,14 +1,4 @@
 <?php
-    // Sing up rough sketch:
-
-    // include_once("includes/php/dbh_inc.php");
-    // $password_hash = password_hash('123', PASSWORD_DEFAULT);
-    // $sql = "INSERT INTO user (role, name, username, password, orders, account ) VALUES ('admin', 'Russell', 'adm3in_test', '" . $password_hash . "', '', 2000)"; // Creating a user with hashed password
-    // $result = mysqli_query($conn, $sql);
-    // var_dump($result);
-  ?>
-
-<?php
 
   $username = isset($_POST['username']) ? $_POST['username'] : '';
   $password = isset($_POST['password']) ? $_POST['password'] : '';
@@ -27,18 +17,18 @@
   }
 
   if( !isset($_POST['username']) || empty($_POST['username']) ){
-    $message .= "Username cannot be empty!";
+    $message .= "Username cannot be empty! ";
     $ok = false;
   }
 
   if( !isset($_POST['password']) || empty($_POST['password']) ){
-    $message .= "Password cannot be empty!";
+    $message .= "Password cannot be empty! ";
     $ok = false;
   }
 
   if($ok){
     include_once 'dbh_inc.php';
-    $sql = "SELECT id, role, password, name, orders, account, history FROM user WHERE username = '" . $username . "'";
+    $sql = "SELECT id, role, password, name, cart, account, orders FROM user WHERE username = '" . $username . "'";
     $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
 
     if( !password_verify($password, $result['password']) ){
@@ -53,7 +43,7 @@
           'name' => $result['name'],
           'orders' => $result['orders'],
           'account' => $result['account'],
-          'account_history' => $result['history'],
+          'account_history' => $result['cart'],
         )
       );
     }

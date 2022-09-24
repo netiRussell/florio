@@ -5,8 +5,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 session_start();
-// $request = $_POST['request'];
-$request = "show_products";
+$request = $_POST['request'];
+// $request = "sign_up";
 
 if( $request == "init_session"){
   $_SESSION['id'] = $_POST['id'];
@@ -41,6 +41,40 @@ if( $request == "init_session"){
   echo json_encode(
     array(
       'html' => $html,
+    )
+  );
+} else if( $request == 'sign_up'){
+  $status = true;
+  $message = "";
+
+  $name = isset($_POST['name']) ? $_POST['name'] : '';
+  $username = isset($_POST['username']) ? $_POST['username'] : '';
+  $password = isset($_POST['password']) ? $_POST['password'] : '';
+
+  if( (!isset($_POST['username']) || empty($_POST['username'])) || (!isset($_POST['name']) || empty($_POST['name'])) || (!isset($_POST['password']) || empty($_POST['password']))){
+    $message = "One of the text fields is empty.";
+    $status = false;
+  }
+
+  if($status){
+
+    include 'dbh_inc.php';
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    $sql = "INSERT INTO user (role, name, username, password, cart, account, orders ) VALUES ('user', '".$name."', '".$username."', '".$password_hash."', '[]', 0, '[]')";
+
+    $result = mysqli_query($conn, $sql);
+
+    if(!$result){
+      $status = false;
+      $message = "Server error(sql / connection)";
+    }
+
+  }
+
+  echo json_encode(
+    array(
+      'status' => $status,
+      'message' => $message
     )
   );
 }

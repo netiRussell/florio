@@ -4,7 +4,7 @@
 
     <div class="login_form">
       <input type="text" id="username" class="login_input text_input text5" spellcheck="false" placeholder="Username" />
-      <input type="password" id="password" class="login_input text5 text_input" placeholder="Password" />
+      <input type="text" id="password" class="login_input text_input text5" placeholder="Password" />
 
       <div class="error_message"></div>
 

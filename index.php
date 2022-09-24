@@ -22,6 +22,12 @@
         }
       ?>
     </main>
+
+    <div id="modal" class="modal hidden">
+      <p class="modal_text text5">This is some text that will be removed</p>
+      <button class="button text6 modal_close">Okay</button>
+    </div>
+    <div id="overlay" class="overlay hidden"></div>
     
     <script type="text/javascript">
       var session_name ='<?php echo $session_id;?>';
