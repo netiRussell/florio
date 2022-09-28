@@ -6,9 +6,11 @@ import * as Async from "./async.js";
 //Functionality
 if (session_name) {
   //User home page
-  let current_page = "us_home";
-  Async.show_products();
+  let current_page = "u_home";
   Async.u_provide_functionality();
+  // ! show acc_info
+  Async.show_products();
+  Async.show_categories();
 } else {
   //Login page & Sign up page
   document.getElementById("login_button").addEventListener("click", function () {

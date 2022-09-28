@@ -36,7 +36,7 @@ const send_request = async function (request_body) {
   });
 };
 
-const provide_func_product = function () {
+const u_provide_func_product = function () {
   const objs = {
     increase: document.getElementById("increase_quantity"),
     decrease: document.getElementById("decrease_quantity"),
@@ -93,24 +93,10 @@ const provide_func_product = function () {
   });
 };
 
-/** Export */
-export function u_provide_functionality() {
-  document.getElementById("func_home").addEventListener("click", function () {
-    window.location.reload();
-  });
-
-  document.getElementById("func_logout").addEventListener("click", function () {
-    send_request(`request=delete_session`).then((_) => {
-      window.location.reload();
-    });
-  });
-}
-
-export async function show_products() {
-  const container = document.getElementsByClassName("content")[0];
-
+const retrieve_html = async function (request, wrapper, change_container = function () {}, provide_func = function () {}) {
+  const container = wrapper;
   try {
-    const response = await send_request("request=show_products").then((data) => {
+    const response = await send_request(request).then((data) => {
       if (!data.ok) {
         throw new Error("Server related error");
       }
@@ -118,36 +104,157 @@ export async function show_products() {
       return data.json();
     });
 
-    container.insertAdjacentHTML("beforeend", response.html);
+    if (!response.status) {
+      throw new Error("Server related error(php)");
+    }
 
-    //Open product page - functionality
-    container.addEventListener("click", async function (e) {
-      if (e.target.classList.contains("thumbnail") || e.target.classList.contains("button")) {
-        const id = e.target.parentElement.parentElement.id;
-        container.parentElement.classList.add("right_section_nosearch");
+    change_container(container);
+    container.innerHTML = response.html;
+    provide_func();
+  } catch (error) {
+    open_modal(error);
+  }
+};
 
-        try {
-          const response = await send_request("request=get_product&id=" + id).then((data) => {
-            if (!data.ok) {
-              throw new Error("Server related error");
-            }
+const look_up = function (container, request, type = "none") {
+  container.innerHTML = "<div class='loader'></div>";
+  container.classList.remove("content_userhome");
+  container.classList.add("content_loading");
 
-            return data.json();
-          });
+  retrieve_html(request, container, function () {
+    container.classList.remove("content_loading");
+    if (type === "home") {
+      container.classList.add("content_userhome");
+    } // ! Как-то домашней странице нужно прогружать этот класс
+  });
+};
 
-          container.parentElement.innerHTML = response.html;
-        } catch (error) {
-          console.log(error);
+const search_bar_func = function (type) {
+  const objs = {
+    search_bar: document.getElementById("seacrh_bar"),
+    button: document.getElementById("magnify_glass"),
+    container: document.querySelector(".content"),
+  };
+
+  const functionality = function (request) {
+    look_up(objs.container, "request=" + request + "&value=" + objs.search_bar.value);
+  };
+
+  if (type === "home") {
+    objs.search_bar.addEventListener("change", function () {
+      functionality("get_products_byname");
+    });
+
+    objs.button.addEventListener("click", function () {
+      functionality("get_products_byname");
+    });
+  } else if (type === "cart") {
+    objs.search_bar.addEventListener("change", function () {
+      functionality("get_products_byname_cart");
+    });
+
+    objs.button.addEventListener("click", function () {
+      functionality("get_products_byname_cart");
+    });
+  } else if (type === "orders") {
+    objs.search_bar.addEventListener("change", function () {
+      functionality("get_products_byname_orders");
+    });
+
+    objs.button.addEventListener("click", function () {
+      functionality("get_products_byname_orders");
+    });
+  }
+};
+
+const search_categories_func = function () {
+  const container = document.querySelector(".content");
+  const categories_arr = [];
+
+  document.querySelector(".w-categories").addEventListener("click", function (event) {
+    const category = event.target;
+
+    if (category.tagName.toLowerCase() === "input") {
+      const index = categories_arr.indexOf(category.id);
+      if (index >= 0) {
+        categories_arr.splice(index, 1);
+      } else {
+        categories_arr.push(category.id);
+      }
+
+      look_up(container, "request=get_products_bycategories&value=" + categories_arr.join(","));
+      console.log(categories_arr.join);
+    }
+  });
+};
+
+const u_provide_func_cart = function () {
+  //place order
+  document.querySelector(".table").addEventListener("click", async function (e) {
+    if (e.target.classList.contains("place_order_func")) {
+      var tr_container = e.target.parentElement?.parentElement;
+      const order_id = tr_container.id;
+      try {
+        const objs = {
+          delivery_address: tr_container.querySelector("input[data-func='delivery_address_func']").value,
+          delivery_date: tr_container.querySelector("input[data-func='delivery_date_func']").value,
+        };
+
+        const response = await send_request("request=u_place_order&order_id=" + order_id + "&address=" + objs.delivery_address + "&date=" + objs.delivery_date).then((data) => {
+          return data.json();
+        });
+
+        if (!response.status) {
+          throw new Error(response.message);
         }
 
-        provide_func_product();
+        open_modal("We have recived your order.", function () {
+          tr_container.remove();
+        });
+      } catch (error) {
+        open_modal(error);
       }
-    });
+    }
+  });
+
+  search_bar_func("cart");
+};
+
+/** Export */
+// Sign up functionality
+export async function sign_up() {
+  const form = {
+    name: document.getElementById("name").value,
+    username: document.getElementById("username").value,
+    password: document.getElementById("password").value,
+    re_password: document.getElementById("re_password").value,
+    message: document.getElementsByClassName("error_message")[0],
+  };
+
+  try {
+    if (form.re_password === form.password) {
+      const response = await send_request(`request=sign_up&name=${form.name}&username=${form.username}&password=${form.password}`).then((data) => {
+        if (!data.ok) {
+          throw new Error("Server related problem(promise didn't come back)");
+        }
+
+        return data.json();
+      });
+
+      if (response.status) {
+        open_modal("Your account has been created", function () {
+          window.location.reload();
+        });
+      } else {
+        throw new Error(response.message);
+      }
+    } else {
+      throw new Error("Re-entered password is not the same.");
+    }
   } catch (error) {
-    console.log(error);
+    form.message.innerHTML = `<p class="p_error text7">${error}</p>`;
   }
 }
-
 // Log in functionality
 export async function login_func() {
   const form = {
@@ -174,14 +281,9 @@ export async function login_func() {
     // Succesful login - transfer to home page
     if (response.ok === true) {
       //Init session
-      send_request(`request=init_session&id=${response.id}&name=${response.name}`);
-
-      // Transformation of html
-      if (response.role === "user") {
-        u_transition_home();
-      } else if (response.role === "admin") {
-        // open admin home page
-      }
+      send_request(`request=init_session&id=${response.id}&name=${response.name}&role=${response.role}`).then((_) => {
+        window.location.reload();
+      });
     } else {
       throw new Error(response.message);
     }
@@ -191,53 +293,87 @@ export async function login_func() {
   }
 }
 
-const u_transition_home = function () {
-  const container = document.getElementsByClassName("main_container")[0];
-  container.classList.remove("login_container");
-  container.classList.add("actual_container");
-  container.innerHTML = "";
-
-  container.insertAdjacentHTML(
-    "beforeend",
-    "<section class='left_section'> <div class='acc_menu'> <p class='acc_info'><span class='username text4'>Mark Gabson</span><span class='balance text6'>$2000.00</span></p> <nav class='w-menu'> <ul class='menu'><li class='regular_li text5' id='func_home'><span class='icon_menu icon_home'></span>Main page</li> <li class='regular_li text5'><span class='icon_menu icon_cart'></span>Cart</li> <li class='regular_li text5'><span class='icon_menu icon_orders'></span>Orders</li> <li class='regular_li text5' id='func_logout'><span class='icon_menu icon_logout'></span>Log out</li> </ul> </nav> </div> <div class='w-categories y_scroll'> <ul class='categories'> <li class='category regular_li text6'> <input type='checkbox' id='category1' /> <label for='category1'>Roses</label> </li> </ul> </div> </section> <section class='right_section'> <div class='w-search_bar'> <input type='text' class='search_bar text_input text6' id='seacrh_bar' placeholder='Search...' /> <span class='magnify_glass'></span> </div> <div class='content content_userhome y_scroll'></div> </section>"
-  );
-
-  show_products();
-  u_provide_functionality();
-};
-
-export async function sign_up() {
-  const form = {
-    name: document.getElementById("name").value,
-    username: document.getElementById("username").value,
-    password: document.getElementById("password").value,
-    re_password: document.getElementById("re_password").value,
-    message: document.getElementsByClassName("error_message")[0],
+// Functionality for user
+export function u_provide_functionality() {
+  const container = document.getElementById("right_section");
+  const change_container = function (container) {
+    container.classList.add("right_section_nocat");
+    container.parentElement?.querySelector(".w-categories")?.remove();
+    container.parentElement?.querySelector(".left_section")?.classList.add("left_no_cat");
   };
 
+  // Main page
+  document.getElementById("func_home").addEventListener("click", function () {
+    window.location.reload();
+  });
+  //Cart
+  document.getElementById("func_cart").addEventListener("click", function () {
+    retrieve_html("request=u_show_cart", container, change_container, function () {
+      u_provide_func_cart();
+    });
+  });
+  //Orders
+  document.getElementById("func_orders").addEventListener("click", function () {
+    retrieve_html("request=u_show_orders", container, change_container, function () {
+      search_bar_func("orders");
+      document.getElementById("seacrh_bar").placeholder = "Seacrh by id(strict)";
+    });
+  });
+  //Log out
+  document.getElementById("func_logout").addEventListener("click", function () {
+    send_request(`request=delete_session`).then((response) => {
+      console.log(response);
+      window.location.reload();
+    });
+  });
+
+  search_bar_func("home");
+  search_categories_func();
+}
+
+// Show all products(should be restructured in case of having more than 500 products)
+export async function show_products() {
+  const container = document.getElementsByClassName("content")[0];
+
   try {
-    if (form.re_password === form.password) {
-      const response = await send_request(`request=sign_up&name=${form.name}&username=${form.username}&password=${form.password}`).then((data) => {
-        if (!data.ok) {
-          throw new Error("Server related problem(promise didn't come back)");
+    const response = await send_request("request=show_products").then((data) => {
+      if (!data.ok) {
+        throw new Error("Server related error");
+      }
+
+      return data.json();
+    });
+
+    container.insertAdjacentHTML("beforeend", response.html);
+
+    //Open product page - functionality
+    container.addEventListener("click", async function (e) {
+      if (e.target.classList.contains("thumbnail") || e.target.classList.contains("button")) {
+        const id = e.target.parentElement?.parentElement?.id;
+        container.parentElement?.classList.add("right_section_nosearch");
+
+        try {
+          const response = await send_request("request=get_product&id=" + id).then((data) => {
+            if (!data.ok) {
+              throw new Error("Server related error");
+            }
+
+            return data.json();
+          });
+
+          container.parentElement.innerHTML = response.html;
+        } catch (error) {
+          console.log(error);
         }
 
-        return data.json();
-      });
-
-      console.log(response);
-
-      if (response.status) {
-        open_modal("Your account has been created", function () {
-          window.location.reload();
-        });
-      } else {
-        throw new Error(response.message);
+        u_provide_func_product();
       }
-    } else {
-      throw new Error("Re-entered password is not the same.");
-    }
+    });
   } catch (error) {
-    form.message.innerHTML = `<p class="p_error text7">${error}</p>`;
+    console.log(error);
   }
+}
+
+export async function show_categories() {
+  retrieve_html("request=show_categories", document?.getElementById("w-categories"));
 }

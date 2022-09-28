@@ -90,7 +90,6 @@
   background-color: #76aa05;
 }
 
-/* If content is too big */
 .y_scroll {
   overflow-y: scroll;
   padding-right: 10px;
@@ -150,6 +149,25 @@
   background-color: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(3px);
   filter: blur(3px);
+}
+
+.loader {
+  margin: 0 auto;
+  border: 8px solid #fff; /* Light grey */
+  border-top: 8px solid var(--main-color); /* Blue */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 body {
@@ -421,6 +439,12 @@ main {
   display: block;
 }
 
+.content_loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .content_userhome {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -569,6 +593,7 @@ main {
 .table {
   border-collapse: collapse;
   border-style: hidden;
+  width: 100%;
 }
 .table td,
 .table th {

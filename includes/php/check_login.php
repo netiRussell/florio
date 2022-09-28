@@ -28,7 +28,7 @@
 
   if($ok){
     include_once 'dbh_inc.php';
-    $sql = "SELECT id, role, password, name, cart, account, orders FROM user WHERE username = '" . $username . "'";
+    $sql = "SELECT id, role, password, name, account, orders FROM user WHERE username = '" . $username . "'";
     $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
 
     if( !password_verify($password, $result['password']) ){
@@ -43,7 +43,6 @@
           'name' => $result['name'],
           'orders' => $result['orders'],
           'account' => $result['account'],
-          'account_history' => $result['cart'],
         )
       );
     }

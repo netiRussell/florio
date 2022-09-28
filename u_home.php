@@ -12,56 +12,13 @@
       </nav>
     </div>
 
-    <div class="w-categories y_scroll">
-      <ul class="categories">
-        <!-- delete -->
-        <li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li>
-        <li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li>
-        <li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li>
-        <li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li><li class="category regular_li text6">
-          <input type="checkbox" id="category1" />
-          <label for="category1">Roses</label>
-        </li>
-      </ul>
+    <div id="w-categories" class="w-categories y_scroll">
     </div>
   </section>
-  <section class="right_section">
+  <section id="right_section" class="right_section">
     <div class="w-search_bar">
-      <input type="text" class="search_bar text_input text6" id="seacrh_bar" placeholder="Search..." />
-      <span class="magnify_glass"></span>
+      <input type="text" class="search_bar text_input text6" id="seacrh_bar" placeholder="Search by name..." />
+      <span id="magnify_glass" class="magnify_glass"></span>
     </div>
 
     <div class="content content_userhome y_scroll"></div>

@@ -16,11 +16,14 @@
       <?php
         $session_id = (isset($_SESSION['name'])) ? $_SESSION['name'] : null;
         if( $session_id ){
-          include 'u_home.php';
+          if($_SESSION['role'] == 'user'){
+            include 'u_home.php';
+          }
         } else {
           include 'login_page.php';
         }
       ?>
+
     </main>
 
     <div id="modal" class="modal hidden">
