@@ -118,12 +118,16 @@ const retrieve_html = async function (request, wrapper, change_container = funct
 
 const look_up = function (container, request, type = "none") {
   container.innerHTML = "<div class='loader'></div>";
-  container.classList.remove("content_userhome");
+  let home = false;
+  if (container.classList.contains("content_userhome")) {
+    container.classList.remove("content_userhome");
+    home = true;
+  }
   container.classList.add("content_loading");
 
   retrieve_html(request, container, function () {
     container.classList.remove("content_loading");
-    if (type === "home") {
+    if (home) {
       container.classList.add("content_userhome");
     } // ! Как-то домашней странице нужно прогружать этот класс
   });
@@ -183,7 +187,6 @@ const search_categories_func = function () {
       }
 
       look_up(container, "request=get_products_bycategories&value=" + categories_arr.join(","));
-      console.log(categories_arr.join);
     }
   });
 };

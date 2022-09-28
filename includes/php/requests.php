@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 session_start();
 $request = isset($_POST['request']) ? $_POST['request'] : null;
-// $request = "get_products_byname_cart";
+// $request = "get_products_byname_orders";
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
 
 
@@ -44,7 +44,7 @@ if($role == "user"){
 
   function form_html_orders($result){
 
-    $html = "<div class='content y_scroll'> <table class='table'> <tr class='text7'> <th>#</th> <th>Order status</th> <th>Price</th> <th>Delivery address</th> <th>Scheduled for</th> </tr>";
+    $html = "<table class='table'> <tr class='text7'> <th>#</th> <th>Order status</th> <th>Price</th> <th>Delivery address</th> <th>Scheduled for</th> </tr>";
 
     while( $row = mysqli_fetch_row($result) ){
       if(strcmp($row[1],'In cart') !== 0){
@@ -55,13 +55,13 @@ if($role == "user"){
       }
     }
 
-    $html .= "</table></div>";
+    $html .= "</div>";
     return $html;
   }
 
   function form_html_cart($conn, $result, $condition){
 
-    $html = "<div class='content y_scroll'> <table class='table'> <tr class='text7'> <th>Thumbnail</th> <th>Name</th> <th>Price</th> <th>Delivery address</th> <th>Schedule for</th> <th></th> </tr>";
+    $html = "<table class='table'> <tr class='text7'> <th>Thumbnail</th> <th>Name</th> <th>Price</th> <th>Delivery address</th> <th>Schedule for</th> <th></th> </tr>";
     while( $row = mysqli_fetch_row($result) ){
       if(strcmp($row[3],'In cart') == 0){
         $sql = "SELECT thumbnail, name FROM products WHERE id=" . $row[2];
@@ -80,7 +80,7 @@ if($role == "user"){
       }
     }
 
-    $html .= "</table></div>";
+    $html .= "</div>";
 
     return $html;
   }
@@ -147,7 +147,9 @@ if($role == "user"){
     $sql = "SELECT id,quantity,product_id,status,price FROM orders WHERE customer_id=" . $id;
     $result = mysqli_query($conn, $sql);
 
-    $html = $searchbar_html . form_html_cart($conn, $result, "");
+    $html = $searchbar_html . "<div class='content y_scroll'>";
+    $html .= form_html_cart($conn, $result, "");
+    $html .= "</div>";
 
     echo json_encode(
       array(
@@ -208,7 +210,9 @@ if($role == "user"){
     $sql = "SELECT id,status,price,delivery_address,scheduled_for FROM orders WHERE customer_id=" . $id;
     $result = mysqli_query($conn, $sql);
 
-    $html = $searchbar_html . form_html_orders($result);
+    $html = $searchbar_html . "<div class='content y_scroll'>";
+    $html .= form_html_orders($result);
+    $html .= "</div>";
     
     echo json_encode(
       array(
@@ -269,15 +273,16 @@ if($role == "user"){
     );
     
   } else if($request == "get_products_byname_orders"){
-    
-    if(empty($_POST['value']) || !isset($_POST['value']) || !is_numeric($_POST['value'])){
-      $_POST['value'] = 0;
-    }
+
     include_once 'dbh_inc.php';
     $id = $_SESSION['id'];
-    $sql = "SELECT id,status,price,delivery_address,scheduled_for FROM orders WHERE customer_id=". $id ." AND id = ".$_POST['value'];
-    $result = mysqli_query($conn, $sql);
 
+    $sql = "SELECT id,status,price,delivery_address,scheduled_for FROM orders WHERE customer_id=". $id;
+    if(!empty($_POST['value']) && isset($_POST['value']) && is_numeric($_POST['value'])){
+      $sql = "SELECT id,status,price,delivery_address,scheduled_for FROM orders WHERE customer_id=". $id ." AND id = ".$_POST['value'];
+    }
+
+    $result = mysqli_query($conn, $sql);
     $html = form_html_orders($result);
 
     echo json_encode(
@@ -290,22 +295,34 @@ if($role == "user"){
   } else if("get_products_bycategories"){
     
     include_once 'dbh_inc.php';
-    $arr = explode(",", $_POST['value']);
-
-    $sql = "SELECT id,category_id FROM products WHERE ";
-
-    // Rough base for the second step
-    // $sql = "SELECT id,name,thumbnail,price,description FROM products WHERE ";
-    // for($i = 0; $i < count($arr); $i++){
-    //   $sql .= "category_id=" . $arr[$i];
-    //   if(!($i+1 == count($arr))){
-    //     $sql .= " OR ";
-    //   }
-    // }
-
+    $provided_categories = explode(",", $_POST['value']);
+    // $provided_categories = explode(",", '1,2,3,4,5');
+    $id_arr = [];
+    $sql = "SELECT id,category_id FROM products";
     $result = mysqli_query($conn, $sql);
 
-    $html = form_html_products($result);
+    while($row = mysqli_fetch_row($result)){
+      if(!empty($row[1]) && isset($row[1])){
+        $row[1] = explode(",", $row[1]);
+        if(array_intersect($provided_categories, $row[1])){
+          array_push($id_arr, $row[0]);
+        }
+      }
+    }
+
+    $sql = "SELECT id,name,thumbnail,price,description FROM products";
+    $count = count($id_arr);
+    if( $count > 0 ){
+      $sql .= " WHERE ";
+      for($i = 0; $i < $count; $i++){
+        $sql .= "id=" . $id_arr[$i];
+        if(!($i+1 == $count)){
+          $sql .= " OR ";
+        }
+      }
+    }
+
+    $html = form_html_products(mysqli_query($conn, $sql));
 
     echo json_encode(
       array(
