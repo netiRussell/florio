@@ -23,6 +23,7 @@
 
     <div class="content content_loading y_scroll">
       <div class="loader"></div>
+      <div style="position: absolute; z-index: 999; background-color: #81bb03; padding: 10px; border-radius: 10px;">Sorry, this page is still in development phase</div>
     </div>
   </section>
 </article>

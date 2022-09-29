@@ -14,10 +14,12 @@
   <body>
     <main>
       <?php
-        $session_id = (isset($_SESSION['name'])) ? $_SESSION['name'] : null;
-        if( $session_id ){
+        $session_role = (isset($_SESSION['role'])) ? $_SESSION['role'] : null;
+        if( $session_role ){
           if($_SESSION['role'] == 'user'){
             include 'u_home.php';
+          } else if($_SESSION['role'] == 'admin'){
+            include 'a_home.php';
           }
         } else {
           include 'login_page.php';
@@ -33,7 +35,7 @@
     <div id="overlay" class="overlay hidden"></div>
     
     <script type="text/javascript">
-      var session_name ='<?php echo $session_id;?>';
+      var session_name ='<?php echo $session_role;?>';
     </script>
     <script type="module" src="includes/js/app.js"></script>
   </body>

@@ -4,13 +4,20 @@
 import * as Async from "./async.js";
 
 //Functionality
-if (session_name) {
+if (session_name === "user") {
   //User home page
-  let current_page = "u_home";
   Async.u_provide_functionality();
-  // ! show acc_info
+  Async.show_acc_info();
   Async.show_products();
   Async.show_categories();
+} else if (session_name === "admin") {
+  console.error("Sorry, this page is still in development phase");
+
+  document.getElementById("func_logout").addEventListener("click", function () {
+    Async.send_request(`request=delete_session`).then(() => {
+      window.location.reload();
+    });
+  });
 } else {
   //Login page & Sign up page
   document.getElementById("login_button").addEventListener("click", function () {

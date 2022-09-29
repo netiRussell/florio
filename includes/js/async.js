@@ -26,16 +26,6 @@ const open_modal = function (text, action = function () {}) {
   });
 };
 
-const send_request = async function (request_body) {
-  return await fetch("includes/php/requests.php", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: request_body,
-  });
-};
-
 const u_provide_func_product = function () {
   const objs = {
     increase: document.getElementById("increase_quantity"),
@@ -110,6 +100,7 @@ const retrieve_html = async function (request, wrapper, change_container = funct
 
     change_container(container);
     container.innerHTML = response.html;
+
     provide_func();
   } catch (error) {
     open_modal(error);
@@ -129,7 +120,7 @@ const look_up = function (container, request, type = "none") {
     container.classList.remove("content_loading");
     if (home) {
       container.classList.add("content_userhome");
-    } // ! Как-то домашней странице нужно прогружать этот класс
+    }
   });
 };
 
@@ -197,12 +188,13 @@ const u_provide_func_cart = function () {
     if (e.target.classList.contains("place_order_func")) {
       var tr_container = e.target.parentElement?.parentElement;
       const order_id = tr_container.id;
-      try {
-        const objs = {
-          delivery_address: tr_container.querySelector("input[data-func='delivery_address_func']").value,
-          delivery_date: tr_container.querySelector("input[data-func='delivery_date_func']").value,
-        };
 
+      const objs = {
+        delivery_address: tr_container.querySelector("input[data-func='delivery_address_func']").value,
+        delivery_date: tr_container.querySelector("input[data-func='delivery_date_func']").value,
+      };
+
+      try {
         const response = await send_request("request=u_place_order&order_id=" + order_id + "&address=" + objs.delivery_address + "&date=" + objs.delivery_date).then((data) => {
           return data.json();
         });
@@ -210,6 +202,8 @@ const u_provide_func_cart = function () {
         if (!response.status) {
           throw new Error(response.message);
         }
+
+        show_acc_info();
 
         open_modal("We have recived your order.", function () {
           tr_container.remove();
@@ -224,6 +218,16 @@ const u_provide_func_cart = function () {
 };
 
 /** Export */
+export async function send_request(request_body) {
+  return await fetch("includes/php/requests.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: request_body,
+  });
+}
+
 // Sign up functionality
 export async function sign_up() {
   const form = {
@@ -284,7 +288,7 @@ export async function login_func() {
     // Succesful login - transfer to home page
     if (response.ok === true) {
       //Init session
-      send_request(`request=init_session&id=${response.id}&name=${response.name}&role=${response.role}`).then((_) => {
+      send_request(`request=init_session&id=${response.id}&name=${response.name}&role=${response.role}&balance=${response.account}`).then((_) => {
         window.location.reload();
       });
     } else {
@@ -325,7 +329,6 @@ export function u_provide_functionality() {
   //Log out
   document.getElementById("func_logout").addEventListener("click", function () {
     send_request(`request=delete_session`).then((response) => {
-      console.log(response);
       window.location.reload();
     });
   });
@@ -334,49 +337,34 @@ export function u_provide_functionality() {
   search_categories_func();
 }
 
-// Show all products(should be restructured in case of having more than 500 products)
+// Show all products(in case of having more than 500 products - implement products loading as the user scrolls)
 export async function show_products() {
   const container = document.getElementsByClassName("content")[0];
+  container.classList.add("content_userhome");
 
-  try {
-    const response = await send_request("request=show_products").then((data) => {
-      if (!data.ok) {
-        throw new Error("Server related error");
-      }
+  retrieve_html(
+    "request=show_products",
+    container,
+    function () {
+      container.classList.remove("content_loading");
+    },
+    function () {
+      container.addEventListener("click", async function (e) {
+        if (e.target.classList.contains("thumbnail") || e.target.classList.contains("button")) {
+          const id = e.target.parentElement?.parentElement?.id;
+          container.parentElement?.classList.add("right_section_nosearch");
 
-      return data.json();
-    });
-
-    container.insertAdjacentHTML("beforeend", response.html);
-
-    //Open product page - functionality
-    container.addEventListener("click", async function (e) {
-      if (e.target.classList.contains("thumbnail") || e.target.classList.contains("button")) {
-        const id = e.target.parentElement?.parentElement?.id;
-        container.parentElement?.classList.add("right_section_nosearch");
-
-        try {
-          const response = await send_request("request=get_product&id=" + id).then((data) => {
-            if (!data.ok) {
-              throw new Error("Server related error");
-            }
-
-            return data.json();
-          });
-
-          container.parentElement.innerHTML = response.html;
-        } catch (error) {
-          console.log(error);
+          retrieve_html(`request=get_product&id=${id}`, container.parentElement, function () {}, u_provide_func_product);
         }
-
-        u_provide_func_product();
-      }
-    });
-  } catch (error) {
-    console.log(error);
-  }
+      });
+    }
+  );
 }
 
 export async function show_categories() {
   retrieve_html("request=show_categories", document?.getElementById("w-categories"));
+}
+
+export async function show_acc_info() {
+  retrieve_html("request=show_acc_info", document.getElementById("acc_info"));
 }

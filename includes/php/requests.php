@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 session_start();
 $request = isset($_POST['request']) ? $_POST['request'] : null;
-// $request = "get_products_byname_orders";
+// $request = "show_acc_info";
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
 
 
@@ -94,6 +94,7 @@ if($role == "user"){
     echo json_encode(
       array(
         'html' => $html,
+        'status' => true
       )
     );
   } else if( $request == "get_product" ){
@@ -111,6 +112,7 @@ if($role == "user"){
     echo json_encode(
       array(
         'html' => $html,
+        'status' => true
       )
     );
   
@@ -188,7 +190,9 @@ if($role == "user"){
       $sql = "UPDATE orders SET status = 'Placed', delivery_address = '".$address."', scheduled_for = '".$date."' WHERE id=" . $order_id;
 
       if(mysqli_query($conn, $sql)){
-        $sql = "UPDATE user SET account = ".(floatval($result['account'])-floatval($price))." WHERE id=" . $customer_id;
+        $balance = (floatval($result['account'])-floatval($price));
+        $sql = "UPDATE user SET account = ".transform_price($balance)." WHERE id=" . $customer_id;
+        $_SESSION['balance'] = $balance;
         $status = mysqli_query($conn, $sql);
       }
 
@@ -292,7 +296,7 @@ if($role == "user"){
       )
     );
     
-  } else if("get_products_bycategories"){
+  } else if($request == "get_products_bycategories"){
     
     include_once 'dbh_inc.php';
     $provided_categories = explode(",", $_POST['value']);
@@ -330,7 +334,16 @@ if($role == "user"){
         'html' => $html
       )
     );
-  }else {
+  } else if( $request == "show_acc_info" ){
+    $html = "<span class='username text4'>".$_SESSION['name']."</span><span class='balance text6'>$".$_SESSION['balance']."</span>";
+
+    echo json_encode(
+      array(
+        'status' => true,
+        'html' => $html
+      )
+    );
+  } else {
     failure();
   }
 
@@ -342,6 +355,7 @@ if($role == "user"){
     $_SESSION['id'] = $_POST['id'];
     $_SESSION['role'] = $_POST['role'];
     $_SESSION['name'] = $_POST['name'];
+    $_SESSION['balance'] = transform_price($_POST['balance']);
 
   } else if( $request == 'sign_up'){
     $status = true;
