@@ -21,5 +21,6 @@ User can:
  - Search orders by id
  - Get notifications in modal window
 
-The application is responsive and secure
+The application is responsive and secure.
+
 Link to figma file: https://www.figma.com/file/ew5defRgVvKeU8iEDngr74/Florio(By-Ruslan-Abdulin)?node-id=1%3A18
